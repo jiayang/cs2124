@@ -4,6 +4,28 @@
 using namespace std;
 
 
+
+bool isLowercase(char c) {
+    //Only lowercase letters are between 'a' and 'z'
+    return c >= 'a' && c <= 'z';
+}
+
+char decrypt(char c, int steps) {
+    //Take the number of steps
+    c -= steps;
+
+    //Check for out of bounds
+    if (c > 'z') {
+        int difference = c - 'z';
+        c = 'a' + (difference-1); //-1 because we want to start at 'a'
+    } else if (c < 'a') {
+        int difference = 'a' - c;
+        c = 'z' - (difference-1); //same as above
+    }
+    return c;
+
+}
+
 int main() {
     //Get file stream
     ifstream text("encrypted.txt");
@@ -16,49 +38,29 @@ int main() {
     //Create vector of lines
     string line;
     vector<string> lines;
-    getLine(text,line); //Increment pointer to next line
-    while (getLine(text, line)) {
+    getline(text,line); //Increment pointer to next line
+    while (getline(text, line)) {
+	//cout << line << endl;
 	lines.push_back(line);
     }
-
-    //Loop through all chars in all lines
-    for (line : lines) {
+    text.close();
+    
+    //Loop through all chars in all lines and decrypt
+    for (int linenum = 0; linenum < lines.size(); ++linenum) {
+	line = lines[linenum];
 	for (int i = 0; i < line.size(); ++i) {
 	    char letter = line[i];
 	    if (isLowercase(letter)) {
-		line[i] = decrypt(letter,steps);
+		lines[linenum][i] = decrypt(letter,steps);
 	    }
 	}
     }
 
-  
-  
-  
-
-
-
-
-}
-
-bool isLowercase(char c) {
-    //Only lowercase letters are between 'a' and 'z'
-    return c >= 'a' && c <= 'z';
-}
-
-char decrypt(char c, int stepsToDo) {
-    int step = -1;
-    if (stepsToDo < 0) {
-	step = 1;
+    //Print ans
+    for (int i = lines.size() - 1; i >= 0; --i) {
+        cout << lines[i] << endl;
     }
-    while (stepsToDo != 0) {
-	c += step;
-	stepsToDo += step;
-	if (c <= 'a') {
-	    c = 'z';
-	} else if (c >= 'z') {
-	    c = 'a';
-	}
-    }
-    return c;
+
+    return 0;
 
 }
