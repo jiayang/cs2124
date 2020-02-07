@@ -104,10 +104,10 @@ int main() {
     for (int n : ints) {
 	cout << n << endl;
     }
-    for (size_t i = ints.size(); i > 0; --i) {
-	cout << ints[i - 1] << endl;
+    for (size_t i = ints.size()-1; i < ints.size(); --i) {
+	cout << ints[i] << endl;
     }
-
+    /*
     //number 12
     vector<int> primes{2,3,5,7,11,13,17,19};
     for (int prime : primes) {
@@ -123,5 +123,5 @@ int main() {
 
     //number 15
     doubleWithRangedFor(primes);
-    displayVectorOfInts(primes);
+    displayVectorOfInts(primes);*/
 }

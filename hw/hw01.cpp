@@ -1,15 +1,18 @@
+//hw01 - Caesar Cypher 
+//Jiayang Chen
+
 #include <vector>
 #include <iostream>
 #include <fstream>
 using namespace std;
 
 
-
+//Checks if character is lowercase
 bool isLowercase(char c) {
-    //Only lowercase letters are between 'a' and 'z'
-    return c >= 'a' && c <= 'z';
+    return c >= 'a' && c <= 'z'; //Check if between 'a' and 'z'
 }
 
+//Decrypts the character given the number of steps
 char decrypt(char c, int steps) {
     //Take the number of steps
     c -= steps;
@@ -17,10 +20,10 @@ char decrypt(char c, int steps) {
     //Check for out of bounds
     if (c > 'z') {
         int difference = c - 'z';
-        c = 'a' + (difference-1); //-1 because we want to start at 'a'
+        c = 'a' + (difference-1); //-1 because we want to start at 'a' after wrap
     } else if (c < 'a') {
         int difference = 'a' - c;
-        c = 'z' - (difference-1); //same as above
+        c = 'z' - (difference-1); 
     }
     return c;
 
@@ -62,5 +65,4 @@ int main() {
     }
 
     return 0;
-
 }
