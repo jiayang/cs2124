@@ -17,12 +17,22 @@ struct Hydrocarbon {
 
 };
 
+size_t findPos(const vector<Hydrocarbon>& formulas, int carbons, int hydrogens);
+void addFormula(vector<Hydrocarbon>& formulas, const string& formulaName,
+                int carbons, int hydrogens);
+void openFile(ifstream& ifs);
+void parseStream(ifstream& ifs, vector<Hydrocarbon>& formulas);
+bool lessThan(const Hydrocarbon& a, const Hydrocarbon& b);
+void sortFormulas(vector<Hydrocarbon>& formulas);
+void printVectorOfHydrocarbons(const vector<Hydrocarbon>& formulas);
+
 //Check if there already is an entry with same number of C's and H's in vector
 //i = vector.size() means could not find
-int findPos(const vector<Hydrocarbon>& formulas, int carbons, int hydrogens) {
+size_t findPos(const vector<Hydrocarbon>& formulas, int carbons, int hydrogens) {
     size_t i = 0;
     while (i < formulas.size()) {
         const Hydrocarbon& formula = formulas[i];
+        //If the carbons match
         if (formula.carbons == carbons && formula.hydrogens == hydrogens) {
             return i;
         }
@@ -79,10 +89,8 @@ void parseStream(ifstream& ifs, vector<Hydrocarbon>& formulas) {
 
 //Compares two hydrocarbons, returns true if a belongs before (less than) b
 bool lessThan(const Hydrocarbon& a, const Hydrocarbon& b) {
-    if (a.carbons != b.carbons) {
-        return a.carbons < b.carbons;
-    }
-    return a.hydrogens < b.hydrogens;
+    return (a.carbons != b.carbons && a.carbons > b.carbons)
+        || (a.hydrogens > b.hydrogens);
 
 }
 

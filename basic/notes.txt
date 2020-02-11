@@ -1,0 +1,4 @@
+1. initialization list - order does not matter,
+   stuff gets init'd in the order of declaration
+
+2. const on a method only protects the caller foo.bar() protects foo

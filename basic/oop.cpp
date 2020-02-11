@@ -14,4 +14,6 @@ int main() {
   Person john;
   john.name = "John";
   john.display();
+
+  cout << 1 << endl;
 }
