@@ -79,7 +79,7 @@ void addWarrior(ifstream& commands, vector<Warrior>& warriors) {
     string name;
     int str;
     commands >> name >> str;
-    warriors.push_back(Warrior(name,str));
+    warriors.emplace_back(name,str);
 }
 
 //Prints the status of all the warriors
