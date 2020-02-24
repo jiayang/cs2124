@@ -1,5 +1,5 @@
 //Jiayang Chen
-//HW 02
+//hw02.cpp
 //Creating warriors that fight each other to the death
 
 #include <iostream>

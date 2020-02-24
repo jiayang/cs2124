@@ -2,3 +2,17 @@
    stuff gets init'd in the order of declaration
 
 2. const on a method only protects the caller foo.bar() protects foo
+
+3. pointers
+   int x = 17;
+   int* p = &x; "int pointer p assigned address of x"
+   cout << *p << endl; "dereference p"
+
+   we can also assign
+   *p = 42;
+
+   to initiate a nullpointer
+   int* p;
+   p(nullptr);
+
+   spouse->name == (*spouse).name
