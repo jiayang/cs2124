@@ -16,3 +16,14 @@
    p(nullptr);
 
    spouse->name == (*spouse).name
+
+
+4. Destructors are automagically called when instance is out of scope
+   ~[CLASSNAME]() {
+
+   }
+
+5. Copy constructors
+   Foo(Foo aFoo) {
+       bar();
+   }

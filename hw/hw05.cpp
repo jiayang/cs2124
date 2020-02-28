@@ -1,10 +1,11 @@
 //Jiayang Chen
-//Creating nobles who hire and fire warriors
-//hw04.cpp
+//Creating nobles who hire and fire warriors **DYNAMICALLY**!
+//hw05.cpp
 
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
 //A warrior class that has a name and a strength
@@ -160,6 +161,9 @@ public:
             cout << name << " defeats " << other.name << endl;
         }
     }
+
+    //Returns the name
+    string getName() const { return name; }
     
 private:
     string name;
@@ -167,54 +171,171 @@ private:
     bool isDead;
 };
 
+//Find noble given the vector of nobles
+size_t findNoble(const vector<Noble*>& nobles, const string& name) {
+    for (size_t i = 0; i < nobles.size(); ++i) {
+        if (nobles[i]->getName() == name) {
+            return i;
+        }
+    }
+    return nobles.size();
+}
+
+//Finds a warrior from a vector given a name
+size_t findWarrior(const vector<Warrior*>& warriors, const string& name) {
+    for (size_t i = 0; i < warriors.size(); ++i) {
+        if (warriors[i]->getName() == name) {
+            return i;
+        }
+    }
+    return warriors.size();
+}
+
+
+//Creates a warrior from the stream and adds it to the vector of warriors
+void addWarrior(ifstream& commands, vector<Warrior*>& warriors) {
+    string name;
+    int str;
+    commands >> name >> str;
+    Warrior* newWarrior = new Warrior(name,str);
+    warriors.push_back(newWarrior);
+}
+
+//Creates a warrior from the stream and adds it to the vector of warriors
+void addNoble(ifstream& commands, vector<Noble*>& nobles) {
+    string name;
+    commands >> name;
+    Noble* newNoble = new Noble(name);
+    nobles.push_back(newNoble);
+}
+//Prints the status of all the warriors
+void status(const vector<Warrior*>& warriors) {
+    cout << "There are " << warriors.size() << " warriors." << endl;
+    for (Warrior* warrior : warriors) {
+        cout << *warrior << endl;
+    }
+}
+
+//Initiates a battle between two nobles
+void battle(ifstream& commands, vector<Noble*>& nobles) {
+    string name1,name2;
+    commands >> name1 >> name2;
+    //Find the index of the nobles
+    size_t index1 = findNoble(nobles, name1);
+    size_t index2 = findNoble(nobles, name2);
+
+    //If either of the indexes is nobles.size() (couldn't find), print error
+    if (index1 == nobles.size() || index2 == nobles.size()) {
+        cerr << "Can not find one of the nobles to fight!" << endl;
+        return;
+    }
+    
+    nobles[index1]->battle(*nobles[index2]);
+}
+
+
+//Hire a warrior to a noble using command stream
+void hire(ifstream& commands, vector<Noble*>& nobles,
+          vector<Warrior*>& warriors) {
+    string nobleName, warriorName;
+    commands >> nobleName >> warriorName;
+    size_t nobleI = findNoble(nobles, nobleName);
+    size_t warriorI = findWarrior(warriors, warriorName);
+
+    nobles[nobleI]->hire(*warriors[warriorI]);
+}
+
+
+//Fire a warrior to a noble using command stream
+void fire(ifstream& commands, vector<Noble*>& nobles,
+          vector<Warrior*>& warriors) {
+    string nobleName, warriorName;
+    commands >> nobleName >> warriorName;
+    size_t nobleI = findNoble(nobles, nobleName);
+    size_t warriorI = findWarrior(warriors, warriorName);
+
+    nobles[nobleI]->fire(*warriors[warriorI]);
+}
+
+//Prints the status of all the nobles and warriors
+void status(const vector<Noble*>& nobles, const vector<Warrior*>& warriors) {
+    //Print all the nobles and their warriors
+    for (const Noble* noble : nobles) {
+        cout << *noble << endl;
+    }
+    //Print all the warriors that were not printed (not hired)
+    for (const Warrior* warrior : warriors) {
+        if (!(warrior->isHired())) {
+            cout << *warrior << endl;
+        }
+    }
+}
+
+//Clear all the warriors
+void clear(vector<Noble*>& nobles, vector<Warrior*>& warriors) {
+    for (Warrior*& warrior : warriors) {
+        delete warrior;
+        warrior = nullptr;
+    }
+    for (Noble*& noble : nobles) {
+        delete noble;
+        noble = nullptr;
+    }
+
+}
 
 int main() {
-    Noble art("King Arthur");
-    Noble lance("Lancelot du Lac");
-    Noble jim("Jim");
-    Noble linus("Linus Torvalds");
-    Noble billie("Bill Gates");
-	
-    Warrior cheetah("Tarzan", 10);
-    Warrior wizard("Merlin", 15);
-    Warrior theGovernator("Conan", 12);
-    Warrior nimoy("Spock", 15);
-    Warrior lawless("Xena", 20);
-    Warrior mrGreen("Hulk", 8);
-    Warrior dylan("Hercules", 3);
-	
-    jim.hire(nimoy);
-    lance.hire(theGovernator);
-    art.hire(wizard);
-    lance.hire(dylan);
-    linus.hire(lawless);
-    billie.hire(mrGreen);
-    art.hire(cheetah);
+    ifstream commands("nobleWarriors.txt");
+    if (!commands) {
+        cerr << "Could not open nobleWarriors.txt" << endl;
+        exit(1);
+    }
 
-    cout << "==========\n"
-         << "Status before all battles, etc.\n";
-    cout << jim << endl;
-    cout << lance << endl;
-    cout << art << endl;
-    cout << linus << endl;
-    cout << billie << endl;
-    cout << "==========\n";
+    vector<Warrior*> warriors; //Vector of warriors
+    vector<Noble*> nobles; // all the nobles
+    
+    string command;
+    //While there are still commands to execute
+    while (commands >> command) {
+        //Create a new warrior
+        if (command == "Warrior") {
+            addWarrior(commands,warriors);
+        }
 
-    art.fire(cheetah);
-    cout << art << endl;
-    art.battle(lance);
-    jim.battle(lance);
-    linus.battle(billie);
-    billie.battle(lance);
+        //Create a new noble
+        else if (command == "Noble") {
+            addNoble(commands,nobles);
+        }
+        
+        //Initiate a battle
+        else if (command == "Battle") {
+            battle(commands, nobles);
+        }
 
-    cout << "==========\n"
-         << "Status after all battles, etc.\n";
-    cout << jim << endl;
-    cout << lance << endl;
-    cout << art << endl;
-    cout << linus << endl;
-    cout << billie << endl;
-    cout << "==========\n";
+        //Hire a warrior
+        else if (command == "Hire") {
+            hire(commands,nobles,warriors);
+        }
+
+        //Fire a warrior
+        else if (command == "Fire") {
+            fire(commands,nobles,warriors);
+        }
+
+        //Print the status for all the warriors
+        else if (command == "Status") {
+            status(nobles,warriors);
+        }
+
+        //Clear all the nobles and warriors
+        else if (command == "Clear") {
+            clear(nobles,warriors);
+        }
+        else {
+            cerr << "Command not recognized: " << command << endl;
+        }
+    }
+    commands.close(); 
 }
 
 

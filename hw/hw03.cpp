@@ -13,10 +13,10 @@ using namespace std;
 class Warrior {
     //Overloading output operator for warrior
     friend ostream& operator<<(ostream& os, const Warrior& warrior) {
-    os << "Warrior: " << warrior.name
-       << ", " << warrior.weapon;
-    return os;
-}
+        os << "Warrior: " << warrior.name
+           << ", " << warrior.weapon;
+        return os;
+    }
 public:
     Warrior(const string& myName, const string& weaponName, int strength)
         : name(myName), weapon(weaponName, strength) {};
