@@ -12,7 +12,7 @@ using namespace std;
 //Also knows if they are hired or not
 class Warrior {
 public:
-    Warrior(const string& aName, int aStrength)
+    Warrior(const string& aName, double aStrength)
         : name(aName), strength(aStrength), hired(false) {};
 
     friend ostream& operator<<(ostream& os, const Warrior& warrior) {
@@ -27,61 +27,69 @@ public:
     void setHired(bool hire) {hired = hire;}
 
     //Returns the name of the warrior
-    string getName() const {return name;}
+    const string& getName() const {return name;}
 
     //Set strength
-    void setStrength(int str) {strength = str;}
+    void setStrength(double str) {strength = str;}
 
     //Returns the strength
-    int getStrength() const {return strength;}
+    double getStrength() const {return strength;}
     
 private:
     string name;
-    int strength;
+    double strength;
     bool hired;
 };
 
 //A noble class who has a name and a vector of warriors
 //Also has a bool for whether or not they are dead
 class Noble {
-public:
-    Noble(const string& aName) : name(aName), isDead(false) {};
-
     friend ostream& operator<<(ostream& os, const Noble& noble) {
         os << noble.name << " has an army of " << noble.warriors.size() << endl;
-        for (Warrior* warriorPtr : noble.warriors) {
+        for (const Warrior* warriorPtr : noble.warriors) {
             os << '\t' << *warriorPtr << endl;
         }
         return os;
     }
-    
+public:
+    Noble(const string& aName) : name(aName), isDead(false) {};
+
     //Hire a warrior, adding a pointer of the warrior to warriors
     //warrior is not a const ref because we change the hired flag
-    bool hire(Warrior& warrior) {
+    bool hire(Warrior* warrior) {
         //Do nothing if noble is already dead or warrior is hired
-        if (isDead || warrior.isHired()) { 
+        if (isDead) {
+            cerr << "noble " << name << " is dead!" << endl;
+            return false;
+        }
+        if (warrior->isHired()) {
+            cerr << "warrior " << warrior->getName() << " is already hired\n"; 
             return false;
         }
 
-        warriors.push_back(&warrior);
-        warrior.setHired(true);
+        warriors.push_back(warrior);
+        warrior->setHired(true);
         return true;
     }
 
     //Fire a warrior
-    bool fire(Warrior& warrior) {
+    bool fire(Warrior* warrior) {
         if (isDead) {
             return false;
         }
         //Find the index of the warrior to be fired
         size_t i = 0;
-        //Keep looping until pointer is the address of warrior
-        while (i < warriors.size() && warriors[i] != &warrior) {
+        //Keep looping until pointer matches
+        while (i < warriors.size() && warriors[i] != warrior) {
             ++i;
         }
 
         //If i == size, that means the warrior was not found
-        if (i == warriors.size()) {return false;}
+        if (i == warriors.size()) {
+            cerr << "There is no such warrior " << warrior->getName() << " in "
+                 << " noble " << name << "'s army" << endl;
+            return false;
+        }
 
         //To remove the warrior ptr from vector, shift everything down
         while (i < warriors.size() - 1) {
@@ -91,79 +99,93 @@ public:
         //Remove the last element to save space
         warriors.pop_back();
 
-        warrior.setHired(false);
-        cout << "You don't work for me anymore " << warrior.getName()
+        warrior->setHired(false);
+        cout << "You don't work for me anymore " << warrior->getName()
              << "! -- " << name << '.' << endl;
         return true;
 
     }
 
     //Battle another noble, using warriors in the order of hiring
-    void battle(Noble& other) {
-        cout << name << " battles " << other.name << endl;
+    void battle(Noble* other) {
+        cout << name << " battles " << other->name << endl;
 
         //Check for edge cases where at least one person is already dead
-        if (isDead && other.isDead) {
+        if (isDead && other->isDead) {
             cout << "Oh, NO! They're both dead! Yuck!" << endl;
             return;
         } else if (isDead) {
-            cout << "He's dead, " << other.name << endl;
+            cout << "He's dead, " << other->name << endl;
             return;
-        } else if (other.isDead) {
+        } else if (other->isDead) {
             cout << "He's dead, " << name << endl;
             return;
         }
 
-        //Indexes for current warrior 1 and 2
-        size_t i = 0;
-        size_t j = 0;
-
-        //Keep looping until i or j reaches the end
-        //i.e one noble is out of warriors
-        while (i < warriors.size() && j < other.warriors.size()) {
-            Warrior& war1 = *(warriors[i]);
-            Warrior& war2 = *(other.warriors[j]);
-            int str1 = war1.getStrength();
-            int str2 = war2.getStrength();
-
-            //Determine which warrior wins the specific battle
-            //"Kill" the losing warrior by setting str to 0
-            if (str1 > str2) {
-                war1.setStrength(str1 - str2);
-                war2.setStrength(0);
-                ++j;
-            } else if (str1 == str2) {
-                war1.setStrength(0);
-                war2.setStrength(0);
-                ++i;
-                ++j;
-            } else {
-                war2.setStrength(str2 - str1);
-                war1.setStrength(0);
-                ++i;
+        double myStr = getStrength();
+        double oStr = other->getStrength();
+        //If this noble is stronger than the other
+        if (myStr > oStr) {
+            //Kill all the warriors in other
+            for (Warrior* warrior : other->warriors) {
+                warrior->setStrength(0);
             }
-            
-            
+            other->isDead = true;
+            //Damage own warriors
+            for (Warrior* warrior : warriors) {
+                //Take off the ratio
+                double ratio = 1 - (oStr / myStr);
+                warrior->setStrength(warrior->getStrength() * ratio);
+            }
+        //If other noble is stronger
+        } else if (oStr > myStr) {
+            //Kill all of own warriors
+            for (Warrior* warrior : warriors) {
+                warrior->setStrength(0);
+            }
+            isDead = true;
+            //Damage other warriors
+            for (Warrior* warrior : other->warriors) {
+                //Take off the ratio
+                double ratio = 1 - (myStr / oStr);
+                warrior->setStrength(warrior->getStrength() * ratio);
+            }
+        //Else they tie
+        } else {
+            //Kill all warriors
+            for (Warrior* warrior : warriors) {
+                warrior->setStrength(0);
+            }
+            for (Warrior* warrior : other->warriors) {
+                warrior->setStrength(0);
+            }
+            isDead = true;
+            other->isDead = true;
         }
-        //After all the battling is done,
-        //if i is at the end, noble1 is dead
-        //if j is at the end, noble2 is dead
-        isDead = i == warriors.size();
-        other.isDead = j == other.warriors.size();
-        if (isDead && other.isDead) {
+
+        
+        if (isDead && other->isDead) {
             cout << "Mutual annihilation: " << name << " and "
-                 << other.name << " die and each other's hands" << endl;
+                 << other->name << " die and each other's hands" << endl;
         }
         else if (isDead) {
-            cout << other.name << " defeats " << name << endl;
+            cout << other->name << " defeats " << name << endl;
         }
-        else if (other.isDead) {
-            cout << name << " defeats " << other.name << endl;
+        else if (other->isDead) {
+            cout << name << " defeats " << other->name << endl;
         }
     }
 
     //Returns the name
-    string getName() const { return name; }
+    const string& getName() const { return name; }
+
+    //Sums the strength of all the warriors
+    double getStrength() const {
+        double str = 0;
+        for (const Warrior* warrior : warriors) {
+            str += warrior->getStrength();
+        }
+    }
     
 private:
     string name;
@@ -197,6 +219,10 @@ void addWarrior(ifstream& commands, vector<Warrior*>& warriors) {
     string name;
     int str;
     commands >> name >> str;
+    //If warrior already exists
+    if (findWarrior(warriors,name) != warriors.size()) {
+        cerr << "warrior " << name << "already exists" << endl;
+    }
     Warrior* newWarrior = new Warrior(name,str);
     warriors.push_back(newWarrior);
 }
@@ -205,6 +231,11 @@ void addWarrior(ifstream& commands, vector<Warrior*>& warriors) {
 void addNoble(ifstream& commands, vector<Noble*>& nobles) {
     string name;
     commands >> name;
+    //If noble already exists
+    if (findNoble(nobles,name) != nobles.size()) {
+        cerr << "noble " << name << "already exists" << endl;
+        return;
+    }
     Noble* newNoble = new Noble(name);
     nobles.push_back(newNoble);
 }
@@ -230,7 +261,7 @@ void battle(ifstream& commands, vector<Noble*>& nobles) {
         return;
     }
     
-    nobles[index1]->battle(*nobles[index2]);
+    nobles[index1]->battle(nobles[index2]);
 }
 
 
@@ -242,7 +273,17 @@ void hire(ifstream& commands, vector<Noble*>& nobles,
     size_t nobleI = findNoble(nobles, nobleName);
     size_t warriorI = findWarrior(warriors, warriorName);
 
-    nobles[nobleI]->hire(*warriors[warriorI]);
+    //If either of them do not exist
+    if (nobleI == nobles.size()) {
+        cerr << "noble " << nobleName << " does not exist" << endl;
+        return;
+    }
+    if (warriorI == warriors.size()) {
+        cerr << "warrior " << warriorName << " does not exist" << endl;
+        return;
+    }
+    
+    nobles[nobleI]->hire(warriors[warriorI]);
 }
 
 
@@ -254,33 +295,58 @@ void fire(ifstream& commands, vector<Noble*>& nobles,
     size_t nobleI = findNoble(nobles, nobleName);
     size_t warriorI = findWarrior(warriors, warriorName);
 
-    nobles[nobleI]->fire(*warriors[warriorI]);
+    //If either of them do not exist
+    if (nobleI == nobles.size()) {
+        cerr << "noble " << nobleName << " does not exist" << endl;
+        return;
+    }
+    if (warriorI == warriors.size()) {
+        cerr << "warrior " << warriorName << " does not exist" << endl;
+        return;
+    }
+    
+    nobles[nobleI]->fire(warriors[warriorI]);
 }
 
 //Prints the status of all the nobles and warriors
 void status(const vector<Noble*>& nobles, const vector<Warrior*>& warriors) {
-    //Print all the nobles and their warriors
-    for (const Noble* noble : nobles) {
-        cout << *noble << endl;
+    cout << "Status\n=====\nNobles:\n";
+    if (nobles.size() == 0) {
+        cout << "NONE" << endl;
+    } else {
+        //Print all the nobles and their warriors
+        for (const Noble* noble : nobles) {
+            cout << *noble;
+        }
     }
+    cout << "Unemployed Warriors: " << endl;
+    bool printedUnemployed = false;
     //Print all the warriors that were not printed (not hired)
     for (const Warrior* warrior : warriors) {
         if (!(warrior->isHired())) {
             cout << *warrior << endl;
+            printedUnemployed = true;
         }
+    }
+    //If no unemployed warriors were printed and the flag is still false
+    if (!printedUnemployed) {
+        cout << "NONE" << endl;
     }
 }
 
 //Clear all the warriors
 void clear(vector<Noble*>& nobles, vector<Warrior*>& warriors) {
-    for (Warrior*& warrior : warriors) {
+    for (Warrior* warrior : warriors) {
         delete warrior;
-        warrior = nullptr;
     }
-    for (Noble*& noble : nobles) {
+    for (Noble* noble : nobles) {
         delete noble;
-        noble = nullptr;
     }
+
+    //After deleting the items on the heap, the pointers still remain
+    //To remove them, just clear the vector
+    nobles.clear();
+    warriors.clear();
 
 }
 
