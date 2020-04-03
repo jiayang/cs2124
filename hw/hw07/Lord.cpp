@@ -1,5 +1,6 @@
 #include "Noble.h"
 #include "Protector.h"
+#include "Lord.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -10,10 +11,10 @@ namespace WarriorCraft {
 
     //Hire a protector, adding a pointer of the protector to protectors
     //protector is not a const ref because we change the hired flag    
-    bool Lord::hire(Protector& protector) {
+    bool Lord::hires(Protector& protector) {
         //Do nothing if lord is already dead or protector is hired
-        if (isDead) {
-            cerr << "noble " << name << " is dead!" << endl;
+        if (isDead()) {
+            //cerr << "noble " << getName() << " is dead!" << endl;
             return false;
         }
         if (protector.isHired()) {
@@ -27,6 +28,10 @@ namespace WarriorCraft {
         return true;
     }
 
+    const string& Lord::getName() const {
+        return this->Noble::getName();
+    }
+    
     //Removes a protector from protectors
     bool Lord::remove(Protector* protector) {
         //Find the index of the protector to be removed
@@ -54,35 +59,40 @@ namespace WarriorCraft {
 
     //Fire a protector
     bool Lord::fire(Protector& protector) {
-        if (isDead) {
+        if (isDead()) {
             return false;
         }
         //Remove the protector, check if it works also
         if (!remove(&protector)) {
             cerr << "There is no such protector " << protector.getName()
                  << " in "
-                 << " lord " << name << "'s army" << endl;
+                 << " lord " << getName() << "'s army" << endl;
             return false;
         }
     
         protector.hiredBy(nullptr);
         cout << "You don't work for me anymore " << protector.getName()
-             << "! -- " << name << '.' << endl;
+             << "! -- " << getName() << '.' << endl;
         return true;
     
     }
 
     //Multiply every lord's strength by the ratio
-    void weaken(double ratio) {
+    void Lord::weaken(double ratio) {
         for (Protector* protector : protectors) {
             protector->setStrength(protector->getStrength() * ratio);
+        }
+        if (ratio == 0) {
+            setIsDead(true);
         }
     }
 
     //Battlecry by calling protector battlecrys
-    void battlecry() const {
+    void Lord::battlecry() const {
         for (const Protector* protector : protectors) {
-            protector.battlecry();
+            if (protector->getStrength() > 0) {
+                protector->battlecry();
+            }
         }
     }
     

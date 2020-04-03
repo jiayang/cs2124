@@ -13,7 +13,7 @@ namespace WarriorCraft {
    
     class PersonWithStrengthToFight : public Noble {
     public:
-        PersonWithStrengthToFight(const std::string& aName);
+        PersonWithStrengthToFight(const std::string& aName, int strength);
 
         double getStrength() const;
 

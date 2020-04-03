@@ -9,7 +9,7 @@ namespace WarriorCraft {
         using Protector::Protector;
 
         void battlecry() const;
-    }
+    };
 
 }
 

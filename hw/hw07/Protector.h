@@ -35,7 +35,8 @@ namespace WarriorCraft {
         double getStrength() const;
 
         virtual void battlecry() const = 0;
-        
+
+        Lord* const getLord() const;
     private:
         std::string name;
         double strength;

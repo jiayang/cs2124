@@ -1,30 +1,29 @@
-#include "Warrior.h"
 #include "Noble.h"
 #include <vector>
 #include <string>
 using namespace std;
 
 namespace WarriorCraft {
-    Noble::Noble(const string& aName) : name(aName), isDead(false) {};
+    Noble::Noble(const string& aName) : name(aName), amIDead(false) {};
 
     //Battle another noble, using warriors in the order of hiring
     void Noble::battle(Noble& other) {
         cout << name << " battles " << other.name << endl;
+        battlecry();
+        other.battlecry();
 
         //Check for edge cases where at least one person is already dead
-        if (isDead && other.isDead) {
+        if (amIDead && other.amIDead) {
             cout << "Oh, NO! They're both dead! Yuck!" << endl;
             return;
-        } else if (isDead) {
+        } else if (amIDead) {
             cout << "He's dead, " << other.name << endl;
             return;
-        } else if (other.isDead) {
+        } else if (other.amIDead) {
             cout << "He's dead, " << name << endl;
             return;
         }
 
-        battlecry();
-        other.battlecry();
         double myStr = getStrength();
         double oStr = other.getStrength();
         //If this noble is stronger than the other
@@ -46,14 +45,14 @@ namespace WarriorCraft {
         }
 
         
-        if (isDead && other.isDead) {
+        if (amIDead && other.amIDead) {
             cout << "Mutual annihilation: " << name << " and "
                  << other.name << " die and each other's hands" << endl;
         }
-        else if (isDead) {
+        else if (amIDead) {
             cout << other.name << " defeats " << name << endl;
         }
-        else if (other.isDead) {
+        else if (other.amIDead) {
             cout << name << " defeats " << other.name << endl;
         }
     }
@@ -62,4 +61,10 @@ namespace WarriorCraft {
     //Returns the name
     const string& Noble::getName() const { return name; }
 
+    //Returns if dead
+    bool Noble::isDead() const {return amIDead;}
+
+    void Noble::setIsDead(bool dead) {
+        amIDead = dead;
+    }
 }

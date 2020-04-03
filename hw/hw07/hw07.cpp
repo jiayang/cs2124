@@ -1,7 +1,7 @@
 #include "Lord.h"
 #include "PersonWithStrengthToFight.h"
 #include "Wizard.h"
-#include "Warrior.h"
+#include "Swordsman.h"
 #include "Archer.h"
 using namespace WarriorCraft;
 

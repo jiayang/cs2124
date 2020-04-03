@@ -31,10 +31,13 @@ namespace WarriorCraft {
 
         //Either weaken the noble or its warriors
         virtual void weaken(double multiplier) = 0;
-        
+
+        bool isDead() const;
+
+        void setIsDead(bool dead);
     private:
         std::string name;
-        bool isDead;
+        bool amIDead;
     };
 }
 #endif

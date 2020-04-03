@@ -25,7 +25,7 @@ namespace WarriorCraft {
         }
         lord->remove(this);
         cout << name << " flees in terror, abandoning his lord, "
-             << noble->getName() << endl;
+             << lord->getName() << endl;
         lord = nullptr;
     }
 
@@ -38,4 +38,5 @@ namespace WarriorCraft {
     //Returns the strength
     double Protector::getStrength() const {return strength;}
 
+    Lord* const Protector::getLord() const {return lord;}
 }
