@@ -6,6 +6,7 @@ using namespace std;
 class Instrument {
 public:
     virtual void makeSound() const = 0;
+    virtual void play() const = 0;
 };
 
 class Brass : public Instrument {
@@ -28,9 +29,12 @@ public:
         cout << "To make a sound... bow a string with pitch "
              << freq << endl;
     }
+private:
+    unsigned freq;
 };
 
 class Percussion : public Instrument {
+public:
     Percussion() {}
 
     void makeSound() const override {
@@ -41,31 +45,55 @@ class Percussion : public Instrument {
 class Trumpet : public Brass {
 public:
     Trumpet(unsigned mouthSize) : Brass(mouthSize) {}
+
+    void play() const override {
+        cout << "Toot";
+    }
 };
 
 class Trombone : public Brass {
 public:
     Trombone(unsigned mouthSize) : Brass(mouthSize) {}
+
+    void play() const override {
+        cout << "Blat";
+    }
 };
 
 class Violin : public String {
 public:
     Violin(unsigned freq) : String(freq) {}
+    
+    void play() const override {
+        cout << "Screech";
+    }
 };
 
 class Cello : public String {
 public:
     Cello(unsigned freq) : String(freq) {}
+    
+    void play() const override {
+        cout << "Squawk";
+    }
 };
 
-class Drums : public Percussion {
+class Drum : public Percussion {
 public:
-    Drums() {}
+    Drum() {}
+    
+    void play() const override {
+        cout << "Boom";
+    }
 };
 
-class Cymbals : public Percussion {
+class Cymbal : public Percussion {
 public:
-    Cymbals() {}
+    Cymbal() {}
+    
+    void play() const override {
+        cout << "Crash";
+    }
 };
 
 class Musician {
@@ -85,14 +113,19 @@ public:
         else cerr << "have no instr\n";
     }
 
+    void play() const {
+        if (instr != nullptr) {
+            instr->play();
+        }
+    }
 private:
     Instrument* instr;
 };
 
 class MILL {
 public:
-    void receiveInstr(const Instrument& instr) {
-        instr.makeSound();
+    void receiveInstr(Instrument& instr) {
+        //instr.makeSound();
         for (size_t i = 0; i < instruments.size(); ++i) {
             if (instruments[i] == nullptr) {
                 instruments[i] = &instr;
@@ -123,10 +156,26 @@ public:
     
 private:
     vector<Instrument*> instruments;
-}
+};
+
+class Orch {
+public:
+    void addPlayer(Musician& player) {
+        musicians.push_back(&player);
+    }
+
+    void play() const {
+        for (Musician const* player : musicians) {
+            player->play();
+        }
+        cout << endl;
+    }
+private:
+    vector<Musician*> musicians;
+};
     
 // PART ONE
-int main() {
+/*int main() {
 
     cout << "Define some instruments ------------------------------------\n";
     Drum drum;
@@ -198,3 +247,4 @@ int main() {
   
     cout << endl;
 }
+*/

@@ -1,3 +1,4 @@
+#include "cs1124-rec10-PART-ONE.cpp"
 
 // PART TWO
 int main() {
