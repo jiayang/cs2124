@@ -27,6 +27,7 @@ namespace WarriorCraft {
         cout << name << " flees in terror, abandoning his lord, "
              << lord->getName() << endl;
         lord = nullptr;
+        return true;
     }
 
     //Returns the name of the warrior

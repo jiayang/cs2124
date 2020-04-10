@@ -33,7 +33,7 @@ namespace WarriorCraft {
     }
     
     //Removes a protector from protectors
-    bool Lord::remove(Protector* protector) {
+    bool Lord::remove(const Protector* const protector) {
         //Find the index of the protector to be removed
         size_t i = 0;
         //Keep looping until pointer matches

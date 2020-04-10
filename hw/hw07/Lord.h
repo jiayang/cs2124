@@ -24,7 +24,7 @@ namespace WarriorCraft {
         bool hires(Protector& protector);
         
         //Removes a protector from protectors
-        bool remove(Protector* protector);
+        bool remove(const Protector* const protector);
         
         //Fire a protector
         bool fire(Protector& protectors);
