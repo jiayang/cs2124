@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <unordered_set>
 using namespace std;
 
 /*
@@ -88,11 +89,47 @@ Node* isSublist(Node* find, Node* list) {
     return nullptr;
 }
 
+Node* sharedListBruteForce(Node* a, Node* b) {
+    while (a != nullptr) {
+        Node* curr = b;
+        while (curr != nullptr) {
+            if (a == curr) {
+                return curr;
+            }
+            curr = curr->next;
+        }
+        a = a->next;
+    }
+    return nullptr;
+}
+
+Node* sharedListUsingSet(Node* a, Node* b) {
+    unordered_set<Node*> find;
+    while (a != nullptr) {
+        find.insert(a);
+        a = a->next;
+    }
+    while (b != nullptr) {
+        if (find.find(b) != find.end()) {
+            return b;
+        }
+        b = b->next;
+    }
+    return nullptr;
+}
+
 int main() {
     Node* a = listBuild({1,2,3,6,7,8,9,10});
     Node* b = listBuild({4,5});
+    Node* c = listBuild({3,1,2});
+    
+    a->next = c;
+    b->next = c;
 
-    cout << "Part One:\n"
+    cout << sharedListBruteForce(a,b) << endl;
+    cout << sharedListUsingSet(a,b) << endl;
+    cout << sharedListUsingSet(a,c) << endl;
+    /*cout << "Part One:\n"
          << "a: " << a << endl
          << "b: " << b << endl;
 
@@ -113,5 +150,5 @@ int main() {
     Node* e = listBuild({1,2,3,2,3,2,4,5,6});
     cout << "e: " << e << endl;
     cout << "d is sublist of e?: " << isSublist(d,e) << endl;
-    
+    */
 }
