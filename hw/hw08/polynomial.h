@@ -7,6 +7,7 @@
 #define POLYN
 
 #include <vector>
+#include <iostream>
 
 struct Node {
     Node(int val, Node* next);
@@ -15,6 +16,7 @@ struct Node {
 };
 
 class Polynomial {
+    friend std::ostream& operator<<(std::ostream& os, const Polynomial& poly);
 public:
     Polynomial();
     Polynomial(const std::vector<int>& coeffs);
@@ -23,11 +25,18 @@ public:
     ~Polynomial();
     Polynomial& operator=(const Polynomial& other);
 
-    int eval(int x) const;
+    int evaluate(int x) const;
+
+    Polynomial& operator+=(const Polynomial& other);
+    Polynomial operator+(const Polynomial& other);
+
+    bool operator==(const Polynomial& other);
+    bool operator!=(const Polynomial& other);
 private:
     Node* head;
 
     void deleteFromNodeOn(Node*& toDelete);
+    void purgeZeros();
 };
 
 #endif
